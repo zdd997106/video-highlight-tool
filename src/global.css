@@ -1,0 +1,8 @@
+body {
+  box-sizing: content-box;
+  margin: 0;
+}
+
+body * {
+  box-sizing: inherit;
+}
