@@ -118,7 +118,7 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
 
       <ProgressBar
         value={getProgress()}
-        onChange={(value) => control.seek(value)}
+        onChange={(value) => control.seek(value * control.state.duration)}
       >
         {transcripts.map((transcript) => (
           <Highlight

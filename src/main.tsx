@@ -5,11 +5,14 @@ import { ThemeProvider } from "@mui/material";
 import "./global.css";
 import Pages from "./pages";
 import { theme } from "./theme";
+import { DialogsProvider } from "gexii/dialogs";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={theme}>
-      <Pages />
+      <DialogsProvider>
+        <Pages />
+      </DialogsProvider>
     </ThemeProvider>
   </StrictMode>
 );
