@@ -22,9 +22,15 @@ export function useCurrentTime(
   useEffect(() => {
     if (!videoControl.ref.current) return;
     const video = videoControl.ref.current;
-    video.addEventListener("timeupdate", () => {
+
+    const callback = () => {
       setCurrentTime(getValueRef.current(video.currentTime));
-    });
+    };
+
+    video.addEventListener("timeupdate", callback);
+    return () => {
+      video.removeEventListener("timeupdate", callback);
+    };
   }, [videoControl.ref]);
 
   return currentTime;

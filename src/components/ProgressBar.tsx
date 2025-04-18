@@ -91,7 +91,7 @@ export function Highlight({
       {...props}
       variant="contained"
       sx={{
-        width: duration / control.state.duration,
+        width: `${(duration / control.state.duration) * 100}%`,
         left: `${(offset / control.state.duration) * 100}%`,
       }}
     />
