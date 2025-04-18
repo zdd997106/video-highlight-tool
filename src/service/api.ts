@@ -21,11 +21,14 @@ async function getVideoDuration(file: File) {
   video.preload = "metadata";
   video.src = URL.createObjectURL(file);
 
-  const duration = new Promise<number>((resolve) => {
+  const duration = new Promise<number>((resolve, reject) => {
     video.onloadedmetadata = function () {
       window.URL.revokeObjectURL(video.src);
       resolve(video.duration);
     };
+    video.addEventListener("error", () =>
+      reject(new Error("Failed to load video metadata"))
+    );
   });
 
   return duration;
@@ -41,10 +44,16 @@ function generateTranscriptGroups(duration: number) {
   ];
 
   let start = 0;
-  let end = 1;
+  let end = 0;
   let i = 0;
   let groupIndex = 0;
   while (end < duration) {
+    start = end;
+    end = start + Math.floor(Math.random() * 5) + 1;
+
+    if (end > duration) continue;
+    if (i++ % 2 === 0) continue;
+
     if (
       transcriptGroups[groupIndex].transcripts.length > 0 &&
       Math.random() > 0.75
@@ -57,17 +66,12 @@ function generateTranscriptGroups(duration: number) {
       });
     }
 
-    if (i++ % 2 === 1) {
-      transcriptGroups[groupIndex].transcripts.push({
-        id: id(),
-        start: start,
-        end: end,
-        text: (generate({ min: 5, max: 10 }) as string[]).join(" "),
-      });
-    }
-
-    start = end;
-    end = start + Math.floor(Math.random() * 5) + 1;
+    transcriptGroups[groupIndex].transcripts.push({
+      id: id(),
+      start: start,
+      end: end,
+      text: (generate({ min: 5, max: 10 }) as string[]).join(" "),
+    });
   }
 
   return transcriptGroups;
