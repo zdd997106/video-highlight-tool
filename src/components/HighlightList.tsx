@@ -1,7 +1,7 @@
 import { Link, MenuItem, Stack, Typography } from "@mui/material";
 import { useEffect, useRef } from "react";
-import { useCurrentTime } from "src/hooks";
 
+import { useCurrentTime } from "src/hooks";
 import { VideoControl, TranscriptGroup, Transcript } from "src/types";
 import { formatTimestamp } from "src/utils";
 
@@ -115,7 +115,9 @@ function TranscriptItem({
       >
         {formatTimestamp(transcript.start)}
       </Link>
-      <Typography variant="body1">{transcript.text}</Typography>
+      <Typography variant="body1" whiteSpace="pre-line">
+        {transcript.text}
+      </Typography>
     </MenuItem>
   );
 }

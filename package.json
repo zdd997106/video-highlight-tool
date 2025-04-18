@@ -15,7 +15,9 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@types/lodash": "^4.17.16",
+    "gexii": "^0.0.32",
     "lodash": "^4.17.21",
+    "random-words": "^2.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

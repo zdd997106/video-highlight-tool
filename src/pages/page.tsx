@@ -1,35 +1,82 @@
-import { Box, Stack } from "@mui/material";
+import { Box, Button, Stack } from "@mui/material";
+import { useDialogs } from "gexii/dialogs";
+import { useAction } from "gexii/hooks";
 import { useMemo, useState } from "react";
+
 import { HighlightList } from "src/components/HighlightList";
 import { VideoPreview } from "src/components/VideoPreview";
 import { useVideo } from "src/hooks/useVideo";
+import { api } from "src/service";
 import { TranscriptGroup } from "src/types";
+import { uploadFile } from "src/utils";
+
+// ----------
 
 export default function Page() {
-  const control = useVideo(
-    "https://videos.pexels.com/video-files/3571264/3571264-uhd_2560_1440_30fps.mp4"
+  const dialogs = useDialogs();
+  const uploadVideo = useAction(async (file: File) => api.uploadVideo(file), {
+    onError: (error) => {
+      dialogs.alert("Error", error.message);
+    },
+  });
+
+  const videoInfo = uploadVideo.getData();
+
+  if (!videoInfo) return <Uploader onUpload={uploadVideo.call} />;
+
+  return (
+    <Editor
+      videoUrl={videoInfo.url}
+      transcriptGroups={videoInfo.transcriptGroups}
+    />
   );
-  const [transcriptGroups] = useState<TranscriptGroup[]>(() => [
-    {
-      id: "1",
-      title: "Transcript",
-      transcripts: [
-        { id: "1", start: 0, end: 5, text: "Hello world" },
-        { id: "2", start: 5, end: 10, text: "This is a test" },
-        { id: "3", start: 10, end: 15, text: "This is a test" },
-      ],
-    },
-    {
-      id: "2",
-      title: "Transcript 2",
-      transcripts: [
-        { id: "4", start: 15, end: 20, text: "Hello world" },
-        { id: "5", start: 20, end: 25, text: "This is a test" },
-        { id: "6", start: 25, end: 30, text: "This is a test" },
-      ],
-    },
-  ]);
+}
+
+// ----- COMPONENTS -----
+
+interface UploaderProps {
+  onUpload: (file: File) => void;
+}
+
+function Uploader({ onUpload }: UploaderProps) {
+  const upload = useAction(onUpload);
+
+  // --- HANDLERS ---
+
+  const handleUploadClick = async () => {
+    const fileList = await uploadFile({
+      multiple: false,
+      accept: "video/*",
+    });
+
+    if (!fileList || fileList.length === 0) return;
+
+    const file = fileList[0];
+
+    upload.call(file);
+  };
+
+  return (
+    <Stack height="100vh" alignItems="center" justifyContent="center">
+      <Button
+        variant="contained"
+        loading={upload.isLoading()}
+        onClick={handleUploadClick}
+      >
+        Upload Video
+      </Button>
+    </Stack>
+  );
+}
+
+interface EditorProps {
+  videoUrl: string;
+  transcriptGroups: TranscriptGroup[];
+}
+
+function Editor({ transcriptGroups, videoUrl }: EditorProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const control = useVideo(videoUrl);
 
   const selectedTranscripts = useMemo(() => {
     return transcriptGroups
