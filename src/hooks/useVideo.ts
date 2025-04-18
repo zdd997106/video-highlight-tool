@@ -44,7 +44,7 @@ export const useVideo = (url: string): VideoControl => {
     return () => {
       video.removeEventListener("loadedmetadata", callback);
     };
-  }, [videoRef]);
+  }, []);
 
   useEffect(() => {
     if (!videoRef.current) return;
