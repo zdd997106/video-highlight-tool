@@ -55,7 +55,7 @@ export const useVideo = (url: string): VideoControl => {
     return () => {
       video.removeEventListener("ended", callback);
     };
-  });
+  }, []);
 
   return {
     ref: videoRef,
