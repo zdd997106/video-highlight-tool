@@ -19,19 +19,28 @@ export function useCurrentTime(
 
   // --- EFFECTS ---
 
+  useCurrentTimeEffect(videoControl, (time) => {
+    setCurrentTime(getValueRef.current(time));
+  });
+
+  return currentTime;
+}
+
+export function useCurrentTimeEffect(
+  videoControl: VideoControl,
+  callback: (currentTime: number) => void
+) {
+  const callbackRef = useRef(callback);
+  callbackRef.current = callback;
+
   useEffect(() => {
     if (!videoControl.ref.current) return;
     const video = videoControl.ref.current;
 
-    const callback = () => {
-      setCurrentTime(getValueRef.current(video.currentTime));
-    };
-
-    video.addEventListener("timeupdate", callback);
+    const timeupdate = () => callbackRef.current(video.currentTime);
+    video.addEventListener("timeupdate", timeupdate);
     return () => {
-      video.removeEventListener("timeupdate", callback);
+      video.removeEventListener("timeupdate", timeupdate);
     };
   }, [videoControl.ref]);
-
-  return currentTime;
 }

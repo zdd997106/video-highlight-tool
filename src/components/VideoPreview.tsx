@@ -1,5 +1,6 @@
 import { sortBy } from "lodash";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { useEffect, useMemo } from "react";
+import { Box, IconButton, Stack, styled, Typography } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
 import SkipNextOutlinedIcon from "@mui/icons-material/SkipNextOutlined";
@@ -20,6 +21,7 @@ export interface VideoPreviewProps {
 
 export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
   const time = useCurrentTime(control);
+  const transition = 0.5;
 
   // --- FUNCTIONS ---
 
@@ -33,10 +35,22 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
     else control.play();
   };
 
+  const sortedTranscripts = useMemo(
+    () => sortBy(transcripts, "start"),
+    [transcripts]
+  );
+
+  const transitionMaskOpen = useMemo(() => {
+    return sortedTranscripts.some(
+      (transcript) =>
+        time > transcript.end - transition / 2 && time < transcript.end
+    );
+  }, [time]);
+
   // --- HANDLERS ---
 
-  const handleClickPrevious = () => {
-    const last = sortBy([...transcripts], "start")
+  const toPreviousClip = () => {
+    const last = [...sortedTranscripts]
       .reverse()
       .find((transcript) => transcript.end <= time);
 
@@ -44,14 +58,24 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
     control.seek(last.start);
   };
 
-  const handleClickNext = () => {
-    const next = sortBy([...transcripts], "start").find(
+  const toNextClip = () => {
+    const next = sortedTranscripts.find(
       (transcript) => transcript.start > time
     );
 
     if (!next) return control.seek(control.state.duration);
     control.seek(next.start);
   };
+
+  useEffect(() => {
+    if (sortedTranscripts.length === 0 || !control.ref.current) return;
+
+    const currentTranscript = sortedTranscripts.find(
+      (transcript) => transcript.start <= time && transcript.end >= time
+    );
+
+    if (!currentTranscript) toNextClip();
+  }, [time]);
 
   // --- SECTION ELEMENTS ---
 
@@ -70,14 +94,23 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
       </Stack>
     ),
 
+    transitionMask: (
+      <TransitionMask
+        sx={{
+          transition: `opacity ${transition}s`,
+          opacity: transitionMaskOpen ? 1 : 0,
+        }}
+      />
+    ),
+
     buttons: {
       previous: (
-        <IconButton color="inherit" onClick={handleClickPrevious}>
+        <IconButton color="inherit" onClick={toPreviousClip}>
           <SkipPreviousOutlinedIcon />
         </IconButton>
       ),
       next: (
-        <IconButton color="inherit" onClick={handleClickNext}>
+        <IconButton color="inherit" onClick={toNextClip}>
           <SkipNextOutlinedIcon />
         </IconButton>
       ),
@@ -102,7 +135,10 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
         Preview
       </Typography>
 
-      {sections.video}
+      <Box position="relative">
+        {sections.video}
+        {sections.transitionMask}
+      </Box>
 
       <Stack
         direction="row"
@@ -133,3 +169,14 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
     </Stack>
   );
 }
+
+// ----- COMPONENTS -----
+
+const TransitionMask = styled(Box)(() => ({
+  position: "absolute",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: "#000",
+}));
