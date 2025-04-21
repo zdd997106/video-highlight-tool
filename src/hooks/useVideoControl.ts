@@ -4,6 +4,9 @@ import { VideoControl } from "src/types";
 
 // ----------
 
+/**
+ * Custom hook to control a video element.
+ */
 export const useVideoControl = (url: string): VideoControl => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);

@@ -16,6 +16,9 @@ export async function uploadVideo(file: File) {
   };
 }
 
+/**
+ * Gets the duration of a video file.
+ */
 async function getVideoDuration(file: File) {
   const video = document.createElement("video");
   video.preload = "metadata";
@@ -34,6 +37,9 @@ async function getVideoDuration(file: File) {
   return duration;
 }
 
+/**
+ * Generates a random transcript group with a random number of transcripts based on the duration length.
+ */
 function generateTranscriptGroups(duration: number) {
   const transcriptGroups: TranscriptGroup[] = [
     {
@@ -77,6 +83,9 @@ function generateTranscriptGroups(duration: number) {
   return transcriptGroups;
 }
 
+/**
+ * Generates a random ID.
+ */
 function id() {
   return Math.random().toString(36).substring(2, 15);
 }
