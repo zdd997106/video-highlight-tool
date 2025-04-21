@@ -3,9 +3,9 @@ import { useDialogs } from "gexii/dialogs";
 import { useAction } from "gexii/hooks";
 import { useMemo, useState } from "react";
 
+import { useVideoControl } from "src/hooks";
 import { HighlightList } from "src/components/HighlightList";
 import { VideoPreview } from "src/components/VideoPreview";
-import { useVideo } from "src/hooks/useVideo";
 import { api } from "src/service";
 import { TranscriptGroup } from "src/types";
 import { uploadFile } from "src/utils";
@@ -21,7 +21,6 @@ export default function Page() {
   });
 
   const videoInfo = uploadVideo.getData();
-
   if (!videoInfo) return <Uploader onUpload={uploadVideo.call} />;
 
   return (
@@ -51,9 +50,7 @@ function Uploader({ onUpload }: UploaderProps) {
 
     if (!fileList || fileList.length === 0) return;
 
-    const file = fileList[0];
-
-    upload.call(file);
+    upload.call(fileList[0]);
   };
 
   return (
@@ -76,7 +73,7 @@ interface EditorProps {
 
 function Editor({ transcriptGroups, videoUrl }: EditorProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const control = useVideo(videoUrl);
+  const control = useVideoControl(videoUrl);
 
   const selectedTranscripts = useMemo(() => {
     return transcriptGroups
@@ -99,6 +96,7 @@ function Editor({ transcriptGroups, videoUrl }: EditorProps) {
           onSelectChange={setSelectedIds}
         />
       </Box>
+
       <Box
         flex={1}
         padding={2}
@@ -107,7 +105,10 @@ function Editor({ transcriptGroups, videoUrl }: EditorProps) {
         overflow="auto"
         paddingBottom={3}
       >
-        <VideoPreview control={control} transcripts={selectedTranscripts} />
+        <VideoPreview
+          videoControl={control}
+          transcripts={selectedTranscripts}
+        />
       </Box>
     </Stack>
   );

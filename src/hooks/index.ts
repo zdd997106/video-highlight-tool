@@ -1,2 +1,3 @@
 export * from "./useCurrentTime";
-export * from "./useVideo";
+export * from "./useVideoControl";
+export * from "./useClipsControl";

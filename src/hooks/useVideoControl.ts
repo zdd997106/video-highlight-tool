@@ -4,7 +4,7 @@ import { VideoControl } from "src/types";
 
 // ----------
 
-export const useVideo = (url: string): VideoControl => {
+export const useVideoControl = (url: string): VideoControl => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -31,6 +31,11 @@ export const useVideo = (url: string): VideoControl => {
   const isPlaying = () => {
     if (!videoRef.current) return false;
     return !videoRef.current.paused && !videoRef.current.ended;
+  };
+
+  const currentTime = () => {
+    if (!videoRef.current) return 0;
+    return videoRef.current.currentTime;
   };
 
   // --- EFFECTS ---
@@ -63,5 +68,6 @@ export const useVideo = (url: string): VideoControl => {
     play,
     pause,
     seek,
+    currentTime,
   };
 };
