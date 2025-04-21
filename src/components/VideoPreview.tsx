@@ -1,12 +1,10 @@
-import { sortBy } from "lodash";
-import { useEffect, useMemo } from "react";
 import { Box, IconButton, Stack, styled, Typography } from "@mui/material";
 import PlayArrowOutlinedIcon from "@mui/icons-material/PlayArrowOutlined";
 import PauseOutlinedIcon from "@mui/icons-material/PauseOutlined";
 import SkipNextOutlinedIcon from "@mui/icons-material/SkipNextOutlined";
 import SkipPreviousOutlinedIcon from "@mui/icons-material/SkipPreviousOutlined";
 
-import { useCurrentTime } from "src/hooks";
+import { useCurrentTime, useClipsControl } from "src/hooks";
 import { Transcript, VideoControl } from "src/types";
 import { formatTimestamp } from "src/utils";
 
@@ -15,13 +13,14 @@ import ProgressBar, { Highlight } from "./ProgressBar";
 // ----------
 
 export interface VideoPreviewProps {
-  control: VideoControl;
+  videoControl: VideoControl;
   transcripts: Transcript[];
 }
 
-export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
-  const time = useCurrentTime(control);
+export function VideoPreview({ videoControl, transcripts }: VideoPreviewProps) {
   const transition = 0.5;
+  const control = useClipsControl({ videoControl, transcripts, transition });
+  const time = useCurrentTime(control);
 
   // --- FUNCTIONS ---
 
@@ -35,82 +34,46 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
     else control.play();
   };
 
-  const sortedTranscripts = useMemo(
-    () => sortBy(transcripts, "start"),
-    [transcripts]
-  );
-
-  const transitionMaskOpen = useMemo(() => {
-    return sortedTranscripts.some(
-      (transcript) =>
-        time > transcript.end - transition / 2 && time < transcript.end
-    );
-  }, [time]);
-
-  // --- HANDLERS ---
-
-  const toPreviousClip = () => {
-    const last = [...sortedTranscripts]
-      .reverse()
-      .find((transcript) => transcript.end <= time);
-
-    if (!last) return control.seek(0);
-    control.seek(last.start);
-  };
-
-  const toNextClip = () => {
-    const next = sortedTranscripts.find(
-      (transcript) => transcript.start > time
-    );
-
-    if (!next) return control.seek(control.state.duration);
-    control.seek(next.start);
-  };
-
-  useEffect(() => {
-    if (sortedTranscripts.length === 0 || !control.ref.current) return;
-
-    const currentTranscript = sortedTranscripts.find(
-      (transcript) => transcript.start <= time && transcript.end >= time
-    );
-
-    if (!currentTranscript) toNextClip();
-  }, [time]);
-
   // --- SECTION ELEMENTS ---
 
   const sections = {
     video: (
-      <Stack position="relative">
-        <Box
-          component="video"
-          width="100%"
-          ref={control.ref}
-          sx={{ aspectRatio: "16/9", bgcolor: "#000" }}
-        >
-          <source src={control.state.src} type="video/mp4" />
-          Your browser does not support the video tag.
-        </Box>
-      </Stack>
+      <Box
+        component="video"
+        width="100%"
+        ref={control.ref}
+        sx={{ aspectRatio: "16/9", bgcolor: "#000" }}
+      >
+        <source src={control.state.src} type="video/mp4" />
+        Your browser does not support the video tag.
+      </Box>
+    ),
+
+    transcript: (
+      <Box position="absolute" bottom={0} left={0} width="100%" padding={2}>
+        <Typography variant="body2" sx={{ textShadow: "1px 1px 2px #000" }}>
+          {control.getCurrentTranscript()?.text}
+        </Typography>
+      </Box>
     ),
 
     transitionMask: (
       <TransitionMask
         sx={{
           transition: `opacity ${transition}s`,
-          opacity: transitionMaskOpen ? 1 : 0,
+          opacity: control.isTransitioning ? 1 : 0,
         }}
       />
     ),
 
     buttons: {
       previous: (
-        <IconButton color="inherit" onClick={toPreviousClip}>
+        <IconButton color="inherit" onClick={control.toPrevious}>
           <SkipPreviousOutlinedIcon />
         </IconButton>
       ),
       next: (
-        <IconButton color="inherit" onClick={toNextClip}>
+        <IconButton color="inherit" onClick={control.toNext}>
           <SkipNextOutlinedIcon />
         </IconButton>
       ),
@@ -138,6 +101,7 @@ export function VideoPreview({ control, transcripts }: VideoPreviewProps) {
       <Box position="relative">
         {sections.video}
         {sections.transitionMask}
+        {sections.transcript}
       </Box>
 
       <Stack

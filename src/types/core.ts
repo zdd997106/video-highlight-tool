@@ -21,6 +21,7 @@ export interface VideoControl {
   play: () => void;
   pause: () => void;
   seek: (time: number) => void;
+  currentTime: () => number;
 }
 
 export interface VideoState {
