@@ -1,54 +1,68 @@
-# React + TypeScript + Vite
+# Video Highlight Tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A simple web application that allows users to upload a video and preview selected highlight clips.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Upload and play local video files
+- Load and display highlight segments (with randomized transcripts)
+- Clickable highlight list to jump to specific timestamps
+- "Highlight Reel" playback mode that plays selected clips in sequence
+- Smooth transitions between clips using a fade-to-black effect
+- Responsive layout for desktop and mobile
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js (v18 or later recommended)
+- Yarn
+
+### Installation
+
+1. Clone the repository:
+
+```bash
+git https://github.com/zdd997106/video-highlight-tool.git
+cd video-highlight-tool
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+yarn install
 ```
+
+3. Start the development server:
+
+```bash
+yarn dev
+```
+
+The application will be available at `http://localhost:5173` (or the port shown in the terminal).
+
+## Project Structure
+
+```
+src/
+├── components/      // UI components
+├── hooks/           // Custom hooks
+├── pages/           // Main app views
+├── service/         // API request functions (mocked for this project)
+├── theme/           // Styling (MUI theme, global styles)
+├── type/            // Shared TypeScript types
+├── utils/           // Utility functions
+└── main.tsx         // App entry point
+eslint.config.js     // ESLint rules
+index.html           // HTML template
+```
+
+## Development Notes
+
+- Bootstrapped with [Vite](https://vitejs.dev/)
+- Built with [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- Styled using [MUI](https://mui.com/)
+
+## References
+
+- Assignment definition: [Video Highlight Tool Requirements](https://gist.github.com/vickyliin/879d4454bff348641c9c45298c2063ef)

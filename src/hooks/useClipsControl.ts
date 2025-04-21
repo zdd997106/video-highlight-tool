@@ -7,6 +7,10 @@ import { useCurrentTimeEffect } from "./useCurrentTime";
 
 // ----------
 
+/**
+ * Custom hook to control a video element with clips.
+ */
+
 export const useClipsControl = (arg: {
   videoControl: VideoControl;
   transcripts: Transcript[];
@@ -36,6 +40,7 @@ export const useClipsControl = (arg: {
 
   // --- FUNCTIONS ---
 
+  /** Jumps to the start of the previous clip */
   const toPrevious = () => {
     const index = getPreviousStartPointIndex();
 
@@ -50,6 +55,7 @@ export const useClipsControl = (arg: {
     else control.seek(start);
   };
 
+  /** Jumps to the start of the next clip */
   const toNext = () => {
     const index = getPreviousStartPointIndex();
     if (index < startPoints.length - 1) control.seek(startPoints[index + 1]);
