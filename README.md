@@ -2,6 +2,10 @@
 
 A simple web application that allows users to upload a video and preview selected highlight clips.
 
+# Demo
+
+- link: https://video-highlight-tool-zdd997.vercel.app
+
 ## Features
 
 - Upload and play local video files
